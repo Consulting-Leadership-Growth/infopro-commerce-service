@@ -1,27 +1,31 @@
 import { Product } from './product.model';
-import { ProcutRepository } from './product.repository';
+import { ProductRepository } from './product.repository';
 
 export const ProductService = {
   findById: async (id: number): Promise<Product | null> => {
-    return ProcutRepository.findById(id);
+    return ProductRepository.findById(id);
+  },
+
+  findBySlug: async (slug: string): Promise<Product | null> => {
+    return ProductRepository.findBySlug(slug);
   },
 
   findAll: async (): Promise<Product[]> => {
-    return ProcutRepository.findAll();
+    return ProductRepository.findAll();
   },
 
   create: async (data: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
-    ProcutRepository.create(data);
+    ProductRepository.create(data);
   },
 
   update: async (
     id: number,
     data: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>
   ) => {
-    ProcutRepository.update(id, data);
+    ProductRepository.update(id, data);
   },
 
   logicDelete: async (id: number) => {
-    ProcutRepository.logicDelete(id);
+    ProductRepository.logicDelete(id);
   },
 };

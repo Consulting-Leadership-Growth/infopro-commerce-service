@@ -6,6 +6,10 @@ export const ProductController = {
     return ProductService.findById(id);
   },
 
+  findBySlug: async (slug: string) => {
+    return ProductService.findBySlug(slug);
+  },
+
   findAll: async () => {
     return ProductService.findAll();
   },

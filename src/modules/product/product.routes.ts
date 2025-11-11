@@ -11,6 +11,14 @@ router.get('/:id', async (req, res, next) => {
     next(error);
   }
 });
+router.get('/slug/:slug', async (req, res, next) => {
+  try {
+    const product = await ProductController.findBySlug(req.params.slug);
+    res.json(product);
+  } catch (error) {
+    next(error);
+  }
+});
 router.get('/', ProductController.findAll);
 router.post('/', async (req, res, next) => {
   try {

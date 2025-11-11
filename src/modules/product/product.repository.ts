@@ -1,9 +1,14 @@
 import prisma from '../../config/database';
+
 import { Product } from './product.model';
 
-export const ProcutRepository = {
+export const ProductRepository = {
   findById: async (id: number): Promise<Product | null> => {
     return prisma.product.findUnique({ where: { id } });
+  },
+
+  findBySlug: async (slug: string): Promise<Product | null> => {
+    return prisma.product.findUnique({ where: { slug } });
   },
 
   findAll: async (): Promise<Product[]> => {
