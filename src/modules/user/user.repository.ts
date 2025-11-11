@@ -1,28 +1,91 @@
+import { Prisma } from '@prisma/client';
 import prisma from '../../config/database';
 import { User } from './user.model';
+import logger from '../../utils/logger';
 
-export const UserRepository = {
-  findById: async (id: number): Promise<User | null> => {
-    return prisma.user.findUnique({ where: { id } });
-  },
+type CreateUserData = Omit<User, 'id' | 'createdAt' | 'updatedAt'>;
+type UpdateUserData = Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>>;
 
-  findAll: async (): Promise<User[]> => {
-    return prisma.user.findMany();
-  },
+export class UserRepository {
+  private static readonly TABLE = 'user';
 
-  create: async (
-    data: Omit<User, 'id' | 'createdAt' | 'updatedAt'>
-  ): Promise<User> => {
-    return prisma.user.create({ data });
-  },
+  private static handleDatabaseError(error: any, context: string): never {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      logger.error(
+        { error: error.code, context },
+        `Erro de banco de dados: ${error.message}`
+      );
+    }
+    throw error;
+  }
 
-  update: async (
-    id: number,
-    data: Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>>
-  ): Promise<User> => {
-    return prisma.user.update({
-      where: { id },
-      data,
-    });
-  },
-};
+  static async findById(id: number): Promise<User | null> {
+    try {
+      return await prisma.user.findUnique({
+        where: { id },
+      });
+    } catch (error) {
+      this.handleDatabaseError(error, `${this.TABLE}.findById`);
+    }
+  }
+
+  static async findAll(options?: {
+    where?: Prisma.UserWhereInput;
+    orderBy?: Prisma.UserOrderByWithRelationInput;
+    skip?: number;
+    take?: number;
+  }): Promise<User[]> {
+    try {
+      return await prisma.user.findMany({
+        where: options?.where,
+        orderBy: options?.orderBy || { createdAt: 'desc' },
+        skip: options?.skip,
+        take: options?.take,
+      });
+    } catch (error) {
+      this.handleDatabaseError(error, `${this.TABLE}.findAll`);
+    }
+  }
+
+  static async findByIds(ids: number[]): Promise<User[]> {
+    try {
+      return await prisma.user.findMany({
+        where: { id: { in: ids } },
+      });
+    } catch (error) {
+      this.handleDatabaseError(error, `${this.TABLE}.findByIds`);
+    }
+  }
+
+  static async create(data: CreateUserData): Promise<User> {
+    try {
+      logger.debug({ data }, 'Criando novo produto no banco');
+      return await prisma.user.create({ data });
+    } catch (error) {
+      this.handleDatabaseError(error, `${this.TABLE}.create`);
+    }
+  }
+
+  static async update(id: number, data: UpdateUserData): Promise<User> {
+    try {
+      logger.debug({ id, data }, 'Atualizando produto no banco');
+      return await prisma.user.update({
+        where: { id },
+        data,
+      });
+    } catch (error) {
+      this.handleDatabaseError(error, `${this.TABLE}.update`);
+    }
+  }
+
+  static async delete(id: number): Promise<User> {
+    try {
+      logger.warn({ userId: id }, 'Deletando usuário permanentemente');
+      return await prisma.user.delete({
+        where: { id },
+      });
+    } catch (error) {
+      this.handleDatabaseError(error, `${this.TABLE}.delete`);
+    }
+  }
+}

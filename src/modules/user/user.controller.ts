@@ -1,23 +1,66 @@
+import { NextFunction, Request, Response } from 'express';
 import { User } from './user.model';
 import { UserService } from './user.service';
+import { HttpStatus } from '../../constants/https-status';
+import { INTERNAL_SERVER_ERROR_MESSAGE } from '../../constants/http-error.constants';
 
-export const UserController = {
-  findById: async (id: number) => {
-    return UserService.findById(id);
-  },
+type CreateUserData = Omit<User, 'id' | 'createdAt' | 'updatedAt'>;
+type UpdateUserData = Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>>;
 
-  findAll: async () => {
-    return UserService.findAll();
-  },
+export class UserController {
+  static async getById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const user = await UserService.findById(Number(id));
 
-  create: async (data: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => {
-    UserService.create(data);
-  },
+      res.status(HttpStatus.OK).json(user);
+    } catch (error: any) {
+      res
+        .status(error.status || HttpStatus.INTERNAL_ERROR)
+        .json({ message: error.message || INTERNAL_SERVER_ERROR_MESSAGE });
+      next(error);
+    }
+  }
 
-  update: async (
-    id: number,
-    data: Omit<User, 'id' | 'createdAt' | 'updatedAt'>
-  ) => {
-    UserService.update(id, data);
-  },
-};
+  static async getAll(_: Request, res: Response, next: NextFunction) {
+    try {
+      const users = await UserService.findAll();
+
+      res.status(HttpStatus.OK).json(users);
+    } catch (error: any) {
+      res
+        .status(error.status || HttpStatus.INTERNAL_ERROR)
+        .json({ message: error.message || INTERNAL_SERVER_ERROR_MESSAGE });
+      next(error);
+    }
+  }
+
+  static async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const data: CreateUserData = req.body;
+      const user = await UserService.create(data);
+
+      res.status(HttpStatus.CREATED).json(user);
+    } catch (error: any) {
+      res
+        .status(error.status || HttpStatus.INTERNAL_ERROR)
+        .json({ message: error.message || INTERNAL_SERVER_ERROR_MESSAGE });
+      next(error);
+    }
+  }
+
+  static async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const data: UpdateUserData = req.body;
+      const user = await UserService.update(Number(id), data);
+
+      res.status(HttpStatus.OK).json(user);
+    } catch (error: any) {
+      res
+        .status(error.status || HttpStatus.INTERNAL_ERROR)
+        .json({ message: error.message || INTERNAL_SERVER_ERROR_MESSAGE });
+      next(error);
+    }
+  }
+}
