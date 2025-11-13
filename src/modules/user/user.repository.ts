@@ -3,7 +3,9 @@ import prisma from '../../config/database';
 import { User } from './user.model';
 import logger from '../../utils/logger';
 
-type CreateUserData = Omit<User, 'id' | 'createdAt' | 'updatedAt'>;
+type CreateUserData = Omit<User, 'id' | 'createdAt' | 'updatedAt'> & {
+  role: string;
+};
 type UpdateUserData = Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>>;
 
 export class UserRepository {
@@ -54,6 +56,26 @@ export class UserRepository {
       });
     } catch (error) {
       this.handleDatabaseError(error, `${this.TABLE}.findByIds`);
+    }
+  }
+
+  static async findByEmail(email: string): Promise<User | null> {
+    try {
+      return await prisma.user.findUnique({
+        where: { email },
+      });
+    } catch (error) {
+      this.handleDatabaseError(error, `${this.TABLE}.findByEmail`);
+    }
+  }
+
+  static async findByUserName(userName: string): Promise<User | null> {
+    try {
+      return await prisma.user.findUnique({
+        where: { userName },
+      });
+    } catch (error) {
+      this.handleDatabaseError(error, `${this.TABLE}.findByUserName`);
     }
   }
 

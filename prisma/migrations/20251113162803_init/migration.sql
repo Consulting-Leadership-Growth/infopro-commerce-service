@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Product" ALTER COLUMN "favIcon" DROP NOT NULL,
+ALTER COLUMN "favIcon" DROP DEFAULT;

@@ -17,6 +17,7 @@ model Product {
   lpContent     String
   lpStyles      String
   lpScripts     String
+  favIcon       String?
   createdAt     DateTime @default(now())
 }
 
@@ -24,7 +25,9 @@ model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   name      String
+  userName  String   @unique
   password  String
+  role      String
   createdAt DateTime @default(now())
 }
 

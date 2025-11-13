@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
-import { User } from './user.model';
-import { UserService } from './user.service';
-import { HttpStatus } from '../../constants/https-status';
 import { INTERNAL_SERVER_ERROR_MESSAGE } from '../../constants/http-error.constants';
+import { HttpStatus } from '../../constants/https-status';
+import { User } from './user.model';
+import { createUserBodySchema } from './user.schema';
+import { UserService } from './user.service';
 
 type CreateUserData = Omit<User, 'id' | 'createdAt' | 'updatedAt'>;
 type UpdateUserData = Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>>;
@@ -37,7 +38,7 @@ export class UserController {
 
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const data: CreateUserData = req.body;
+      const data: CreateUserData = createUserBodySchema.parse(req.body);
       const user = await UserService.create(data);
 
       res.status(HttpStatus.CREATED).json(user);
