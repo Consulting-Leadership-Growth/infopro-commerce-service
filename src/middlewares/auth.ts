@@ -1,8 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
+import { ENV } from '../config/env';
 import jwt from 'jsonwebtoken';
 
+declare global {
+  namespace Express {
+    interface Request {
+      userId?: string;
+      userRole?: string;
+    }
+  }
+}
+
 export function auth(
-  req: Request<{ userId: string }>,
+  req: Request<{ userId: string; userRole: string }>,
   res: Response,
   next: NextFunction
 ) {
@@ -15,9 +25,10 @@ export function auth(
 
     const token = authHeader.split(' ')[1];
 
-    const decoded = jwt.verify(token, '') as jwt.JwtPayload;
+    const decoded = jwt.verify(token, ENV.SECRET) as jwt.JwtPayload;
 
-    req.params.userId = decoded.id;
+    req.userId = decoded.userId;
+    req.userRole = decoded.role;
 
     next();
   } catch (error) {

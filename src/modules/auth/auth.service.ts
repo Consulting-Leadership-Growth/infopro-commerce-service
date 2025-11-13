@@ -12,7 +12,7 @@ export class AuthService {
     FAIL_TO_GENERATE_TOKEN: 'Erro ao gerar o token de autenticação.',
   };
 
-  static generateSecretKey(): string {
+  public static generateSecretKey(): string {
     return crypto.randomBytes(256).toString('hex');
   }
 
@@ -29,15 +29,13 @@ export class AuthService {
         );
       }
 
-      //TODO = Entender por que o token está sendo gerado inválido.
       const token = jwt.sign(
         {
-          email: authRequest.email,
-          userName: authRequest.userName,
+          userId: user.id,
           role: user.role,
         },
         ENV.SECRET,
-        { algorithm: 'HS256', expiresIn: '1h' }
+        { expiresIn: '24h' }
       );
 
       return token;
@@ -47,16 +45,5 @@ export class AuthService {
         HttpStatus.INTERNAL_ERROR
       );
     }
-  }
-
-  private static verifyToken(token: string): Promise<jwt.JwtPayload> {
-    return new Promise((resolve, reject) => {
-      jwt.verify(token, ENV.SECRET, (err, decoded) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(decoded as jwt.JwtPayload);
-      });
-    });
   }
 }

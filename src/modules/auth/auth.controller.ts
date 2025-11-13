@@ -34,4 +34,36 @@ export class AuthController {
       next(error);
     }
   }
+
+  static async validateAdminAuth(
+    req: Request<{ userId: string; userRole: string }>,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const userId = req.userId;
+      const userRole = req.userRole;
+
+      if (!userId || !userRole) {
+        return res
+          .status(HttpStatus.UNAUTHORIZED)
+          .json({ message: 'User params are missing in the request.' });
+      }
+
+      if (userRole !== 'admin') {
+        return res
+          .status(HttpStatus.FORBIDDEN)
+          .json({ message: 'Access denied. Admins only.' });
+      }
+
+      return res
+        .status(HttpStatus.OK)
+        .json({ message: 'Admin authentication validated successfully.' });
+    } catch (error: any) {
+      res
+        .status(error.status || HttpStatus.INTERNAL_ERROR)
+        .json({ message: error.message || INTERNAL_SERVER_ERROR_MESSAGE });
+      next(error);
+    }
+  }
 }
