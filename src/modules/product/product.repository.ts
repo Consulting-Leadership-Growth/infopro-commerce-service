@@ -34,7 +34,7 @@ export class ProductRepository {
   static async findBySlug(slug: string): Promise<Product | null> {
     try {
       return await prisma.product.findUnique({
-        where: { slug },
+        where: { slug, isActive: true },
       });
     } catch (error) {
       this.handleDatabaseError(error, `${this.TABLE}.findBySlug`);
