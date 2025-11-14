@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import { ENV } from '../config/env';
+import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import { ENV } from '../config/env';
 
 declare global {
   namespace Express {

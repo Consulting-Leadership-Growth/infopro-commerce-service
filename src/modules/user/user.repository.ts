@@ -81,7 +81,7 @@ export class UserRepository {
 
   static async create(data: CreateUserData): Promise<User> {
     try {
-      logger.debug({ data }, 'Criando novo produto no banco');
+      logger.debug({ data }, 'Criando novo usuário no banco');
       return await prisma.user.create({ data });
     } catch (error) {
       this.handleDatabaseError(error, `${this.TABLE}.create`);
@@ -90,7 +90,7 @@ export class UserRepository {
 
   static async update(id: number, data: UpdateUserData): Promise<User> {
     try {
-      logger.debug({ id, data }, 'Atualizando produto no banco');
+      logger.debug({ id, data }, 'Atualizando usuário no banco');
       return await prisma.user.update({
         where: { id },
         data,
